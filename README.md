@@ -2,6 +2,29 @@
 
 ---
 
+## Cómo ejecutar el proyecto desde cero
+
+### 1. Requisitos previos
+- **Node.js** (versión 18 o superior recomendada).
+- **npm** (instalado junto con Node.js).
+
+### 2. Instalación de dependencias
+Clona el repositorio (o entra a la carpeta del proyecto) y ejecuta:
+
+```bash
+npm install
+```
+
+### 3. Iniciar el servidor de desarrollo
+Para levantar el entorno local con recarga en vivo (HMR):
+
+```bash
+npm run dev
+```
+
+
+---
+
 ## 1. Contexto
 
 El prototipo de la Entrega 2 se testeó con **6 usuarios** sobre 4 tareas. Los resultados (T1 = 20 s promedio, T2 = 38 s, T3 = 13 s, T4 = 12 s) muestran que **solo T1 y T2 tienen problemas de interfaz**. T3 y T4 no hay que tocarlos.
