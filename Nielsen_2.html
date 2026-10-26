@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Casino — USM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EEF0E7;
+    --bg-panel: #E4E6DA;
+    --white: #FBFAF6;
+    --ink: #1E2A26;
+    --ink-soft: #55655D;
+    --border: #CDD1C2;
+    --primary: #2B5D6B;
+    --primary-soft: #DCE7E7;
+    --veg: #3F5A30;
+    --veg-soft: #E4EBDA;
+    --hipo: #8C6423;
+    --hipo-soft: #F2E6C8;
+    --disabled: #9AA093;
+    --disabled-bg: #E3E4DC;
+    --danger: #A33B3B;
+    --danger-soft: #F4E1E1;
+    --success: #2E7D4F;
+    --info: #2B5D6B;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    --radius: 10px;
+  }
+
+  /* Fix global: garantiza que [hidden] siempre oculte */
+  [hidden] { display: none !important; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Accesibilidad: foco visible consistente */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ---------- Vista Login ---------- */
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
+
+  .login-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+
+  .login-box h2 {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    color: var(--primary);
+    margin: 0 0 8px;
+  }
+
+  .login-box p.sub {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin-top: 0;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    text-align: left;
+    margin-bottom: 18px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #FAFBF8;
+    outline: none;
+    transition: border-color .2s;
+    font-family: inherit;
+  }
+
+  .form-input:focus { border-color: var(--primary); }
+
+  .form-input[aria-invalid="true"] {
+    border-color: var(--danger);
+    background: var(--danger-soft);
+  }
+
+  .field-hint {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  .field-error {
+    display: none;
+    font-size: 0.78rem;
+    color: var(--danger);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .field-error.show { display: block; }
+
+  .btn-login {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: inherit;
+  }
+
+  .btn-login:hover:not(:disabled) { background: #204752; }
+  .btn-login:disabled { background: var(--disabled); cursor: not-allowed; }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: var(--white);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .live-stock-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .live-stock-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: #27ae60;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(39, 174, 96, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+  }
+
+  .stock-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stock-card {
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+
+  .stock-card.veg {
+    background: var(--veg-soft);
+    border: 1px solid var(--veg);
+  }
+
+  .stock-card.hipo {
+    background: var(--hipo-soft);
+    border: 1px solid var(--hipo);
+  }
+
+  .stock-card .st-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .stock-card.veg .st-label { color: var(--veg); }
+  .stock-card.hipo .st-label { color: var(--hipo); }
+
+  .stock-card .st-val {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-top: 2px;
+  }
+
+  /* ---------- App Contenido ---------- */
+  #app-content { display: none; }
+
+  /* ---------- Header Superior ---------- */
+  .app-header {
+    background: var(--primary);
+    color: var(--white);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .app-brand { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.02em; }
+  .app-user { display: flex; gap: 16px; font-size: 0.88rem; align-items: center; }
+  .app-user a { color: var(--primary-soft); text-decoration: none; font-weight: 500; }
+  .app-user a:hover { text-decoration: underline; }
+
+  /* ---------- Navegación Principal ---------- */
+  .main-nav {
+    background: #234B57;
+    display: flex;
+    padding: 0 24px;
+    gap: 8px;
+    overflow-x: auto;
+    align-items: center;
+  }
+  .nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary-soft);
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .nav-btn:hover { color: var(--white); }
+  .nav-btn.active {
+    color: var(--white);
+    border-bottom-color: var(--white);
+  }
+
+  .help-btn {
+    margin-left: auto;
+    background: transparent;
+    border: 1.5px solid var(--primary-soft);
+    color: var(--primary-soft);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+  }
+  .help-btn:hover {
+    background: var(--primary-soft);
+    color: #234B57;
+  }
+
+  /* ---------- Layout Contenedor ---------- */
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 24px 160px;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ---------- Encabezados de Vista ---------- */
+  .page-head h1 { font-family: var(--serif); font-size: 1.8rem; font-weight: 600; margin: 0; }
+  .page-head .campus { margin: 4px 0 0; font-size: 0.95rem; color: var(--primary); font-weight: 600; }
+  .page-head .lede { margin: 10px 0 0; max-width: 680px; color: var(--ink-soft); font-size: 0.92rem; }
+
+  /* ---------- Tarjetas de Saldo ---------- */
+  .balance-cards {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .balance-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    min-width: 130px;
+    text-align: center;
+  }
+  .balance-card .title { font-size: 0.85rem; color: var(--ink-soft); font-weight: 600; }
+  .balance-card .value {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.1;
+    margin-top: 4px;
+  }
+
+  /* ---------- Banner Informativo ---------- */
+  .info-banner {
+    background: var(--primary-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 0.88rem;
+    color: var(--ink);
+  }
+  .info-banner h3 {
+    font-size: 0.95rem; font-weight: 700; margin: 0 0 6px;
+    color: var(--primary); font-family: var(--sans);
+  }
+  .info-banner ul { margin: 0; padding-left: 18px; }
+  .info-banner li { margin-bottom: 4px; }
+  .info-banner li:last-child { margin-bottom: 0; }
+
+  /* ---------- Tablas de Datos ---------- */
+  .table-container {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.88rem;
+  }
+  .data-table th {
+    background: var(--bg-panel);
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .empty-row { text-align: center; color: var(--ink-soft); padding: 32px 24px !important; }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .empty-state p { margin: 0; }
+  .btn-primary-sm {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary-sm:hover { background: #204752; }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+  }
+  .btn-cancel:hover { background: var(--danger); color: var(--white); }
+
+  /* ---------- Leyenda Reserva ---------- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 0 0 20px;
+    padding: 12px 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.85rem; color: var(--ink-soft);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-general { background: var(--border); }
+  .dot-veg { background: var(--veg); }
+  .dot-hipo { background: var(--hipo); }
+  .dot-past { background: var(--disabled); }
+
+  /* ---------- Semanas y Calendario ---------- */
+  .week { margin-bottom: 32px; }
+  .week-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .week-head h2 { font-size: 1.2rem; font-weight: 600; margin: 0; }
+  .week-range { font-size: 0.85rem; color: var(--ink-soft); }
+
+  .week-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .week-quick {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-soft);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+  }
+  .week-quick:hover { border-color: var(--primary); color: var(--primary); }
+
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+
+  /* ---------- Tarjeta de Día ---------- */
+  .day-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease, background .2s ease;
+  }
+  .day-card:focus-visible { box-shadow: 0 0 0 3px var(--primary-soft); }
+
+  .day-card.is-vegetariano { border-left-color: var(--veg); box-shadow: 0 2px 8px rgba(63,90,48,0.12); }
+  .day-card.is-hipocalorico { border-left-color: var(--hipo); box-shadow: 0 2px 8px rgba(140,100,35,0.12); }
+  .day-card.is-past { border-left-color: var(--disabled); background: var(--disabled-bg); opacity: 0.72; }
+
+  /* Día con reserva confirmada */
+  .day-card.is-reserved-veg {
+    background: var(--veg-soft);
+    border-left-color: var(--veg);
+    border-color: var(--veg);
+  }
+  .day-card.is-reserved-hipo {
+    background: var(--hipo-soft);
+    border-left-color: var(--hipo);
+    border-color: var(--hipo);
+  }
+  .day-card.has-pending {
+    border-style: dashed;
+    border-width: 2px;
+  }
+
+  .day-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+  .day-date { display: flex; align-items: baseline; gap: 7px; }
+  .day-name { font-size: 0.82rem; color: var(--ink-soft); font-weight: 500; }
+  .day-num { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; line-height: 1; }
+
+  .badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .badge-today { background: var(--primary); color: var(--white); }
+  .badge-past { background: var(--disabled); color: var(--white); }
+  .badge-reserved { background: var(--veg); color: var(--white); }
+  .badge-reserved.hipo { background: var(--hipo); }
+  .badge-change { background: var(--danger); color: var(--white); }
+
+  .day-preview {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ink);
+    min-height: 2.4em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .day-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .toggle {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 4px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: transparent;
+    transition: background .15s ease, color .15s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .toggle-veg { border: 1.5px solid var(--veg); color: var(--veg); }
+  .toggle-veg.active { background: var(--veg); color: var(--white); }
+  .toggle-hipo { border: 1.5px solid var(--hipo); color: var(--hipo); }
+  .toggle-hipo.active { background: var(--hipo); color: var(--white); }
+  .toggle.pending { outline: 2px dashed currentColor; outline-offset: 2px; }
+
+  .day-status { margin: 0; font-size: 0.75rem; color: var(--ink-soft); }
+
+  .expand-btn {
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 7px 6px;
+    background: var(--bg-panel);
+    border: none;
+    border-radius: 6px;
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .expand-btn .chev { transition: transform .2s ease; }
+  .expand-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+  /* ---------- Panel Expandido ---------- */
+  .day-detail {
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .menu-block h3, .nutrition-block h3 {
+    font-size: 0.75rem; font-weight: 600; color: var(--ink-soft);
+    font-family: var(--sans); margin: 0 0 6px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .menu-block dl {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    row-gap: 6px;
+    column-gap: 8px;
+    margin: 0;
+  }
+  .menu-block dt { font-size: 0.74rem; color: var(--ink-soft); font-weight: 600; }
+  .menu-block dd { margin: 0; font-size: 0.8rem; }
+
+  .nutrition-tabs {
+    display: flex; gap: 4px; margin-bottom: 10px;
+    background: var(--bg-panel); padding: 3px; border-radius: 6px;
+  }
+  .tab-btn {
+    flex: 1; border: none; background: transparent;
+    padding: 7px 4px; font-size: 0.78rem; font-weight: 600;
+    color: var(--ink-soft); border-radius: 4px; cursor: pointer;
+    font-family: inherit;
+  }
+  .tab-btn.active { background: var(--white); color: var(--ink); }
+
+  .kcal-value { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; margin-bottom: 6px; }
+  .kcal-value span { font-family: var(--sans); font-size: 0.75rem; font-weight: 500; color: var(--ink-soft); }
+
+  .macro-row { display: grid; grid-template-columns: 80px 1fr 36px; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .macro-label { font-size: 0.72rem; color: var(--ink-soft); }
+  .macro-val { font-size: 0.72rem; text-align: right; }
+  .bar { height: 5px; background: var(--bg-panel); border-radius: 3px; overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--primary); border-radius: 3px; }
+
+  /* ---------- Barra Resumen Inferior ---------- */
+  .summary-bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    z-index: 5;
+    flex-wrap: wrap;
+  }
+  .summary-text { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+  .summary-text strong { color: var(--ink); font-family: var(--serif); font-size: 1.05rem; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-soft);
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+  }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
+  .btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .confirm-btn {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .confirm-btn:disabled { background: var(--disabled); cursor: not-allowed; }
+  .confirm-btn:not(:disabled):hover { background: #204752; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -12px);
+    background: var(--ink);
+    color: var(--white);
+    padding: 12px 14px 12px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: opacity .25s ease, transform .25s ease;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 92vw;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .toast.toast-success { background: var(--success); }
+  .toast.toast-error { background: var(--danger); }
+  .toast.toast-info { background: var(--info); }
+  .toast-close {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+    opacity: 0.8;
+    font-family: inherit;
+  }
+  .toast-close:hover { opacity: 1; }
+
+  /* ---------- Diálogos ---------- */
+  dialog {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0;
+    background: var(--white);
+    color: var(--ink);
+    max-width: 480px;
+    width: 92vw;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  }
+  dialog::backdrop { background: rgba(30,42,38,0.45); }
+  .dialog-inner { padding: 24px; }
+  .dialog-inner h2 {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    margin: 0 0 12px;
+    color: var(--primary);
+  }
+  .dialog-inner p { font-size: 0.9rem; color: var(--ink-soft); margin: 0 0 16px; }
+  .dialog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .dialog-list li {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+  }
+  .dialog-list li:last-child { border-bottom: none; }
+  .dialog-list .tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .tag-veg { background: var(--veg-soft); color: var(--veg); }
+  .tag-hipo { background: var(--hipo-soft); color: var(--hipo); }
+  .dialog-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .btn-danger {
+    background: var(--danger);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-danger:hover { background: #8b3030; }
+  .btn-secondary {
+    background: var(--bg-panel);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-secondary:hover { background: #d9dbcf; }
+
+  /* ---------- Panel de ayuda ---------- */
+  .help-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 340px;
+    max-width: 92vw;
+    height: 100vh;
+    background: var(--white);
+    border-left: 1px solid var(--border);
+    box-shadow: -8px 0 24px rgba(0,0,0,0.08);
+    padding: 24px;
+    overflow-y: auto;
+    z-index: 90;
+    transform: translateX(100%);
+    transition: transform .25s ease;
+  }
+  .help-panel.open { transform: translateX(0); }
+  .help-panel h2 {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    margin: 0 0 16px;
+    color: var(--primary);
+    padding-right: 30px;
+  }
+  .help-panel h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 18px 0 8px;
+    color: var(--ink);
+  }
+  .help-panel ol, .help-panel ul {
+    padding-left: 20px;
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .help-panel li { margin-bottom: 6px; }
+  .help-panel a { color: var(--primary); }
+  .help-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--ink-soft);
+    line-height: 1;
+    font-family: inherit;
+  }
+  .help-close:hover { color: var(--ink); }
+
+  /* ---------- Filtro de tablas ---------- */
+  .table-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .table-toolbar .form-input { max-width: 280px; }
+
+  /* ---------- Footer ---------- */
+  .app-footer {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 24px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+  .app-footer a { color: var(--ink-soft); text-decoration: none; margin: 0 4px; }
+  .app-footer a:hover { color: var(--primary); text-decoration: underline; }
+
+  @media (max-width: 900px) {
+    .day-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .week-actions { margin-left: 0; }
+  }
+  @media (max-width: 600px) {
+    .day-grid { grid-template-columns: 1fr; }
+    .summary-bar {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+      padding: 14px 16px;
+    }
+    .summary-bar .btn-ghost,
+    .summary-bar .confirm-btn { width: 100%; justify-content: center; }
+    .wrap { padding: 24px 16px 220px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ Vista Login ============ -->
+  <div id="login-view" class="login-container">
+    <div class="login-box">
+      <h2>Sistema Casino USM</h2>
+      <p class="sub">Inicia sesión para gestionar tus reservas o ver qué hay de bueno</p>
+
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="username">Nombre de usuario</label>
+          <input type="text" id="username" class="form-input"
+                 placeholder="Ej: Juan Pérez" required
+                 autocomplete="username" aria-describedby="username-err">
+          <span class="field-error" id="username-err" role="alert"></span>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" class="form-input"
+                 placeholder="Ingresa tu contraseña"
+                 autocomplete="current-password" aria-describedby="password-err">
+          <span class="field-hint">Mínimo 4 caracteres (demo).</span>
+          <span class="field-error" id="password-err" role="alert"></span>
+        </div>
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span class="btn-label">Ingresar</span>
+          <span class="spinner" hidden aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div class="live-stock-section">
+        <div class="live-stock-title">
+          <span class="pulse-dot" aria-hidden="true"></span> Platos especiales disponibles hoy
+        </div>
+        <div class="stock-grid">
+          <div class="stock-card veg">
+            <div class="st-label">🌱 Vegetariano</div>
+            <div class="st-val" id="stock-veg">14</div>
+          </div>
+          <div class="stock-card hipo">
+            <div class="st-label">🥗 Hipocalórico</div>
+            <div class="st-val" id="stock-hipo">8</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ App Principal ============ -->
+  <div id="app-content">
+    <header class="app-header">
+      <div class="app-brand">USM.cl</div>
+      <div class="app-user">
+        <span id="display-username">Tomás Molina</span>
+        <a href="#" id="logout-btn">Cerrar sesión</a>
+      </div>
+    </header>
+
+    <nav class="main-nav" aria-label="Navegación principal">
+      <button class="nav-btn active" data-target="view-reserva">Reserva de menú</button>
+      <button class="nav-btn" data-target="view-mis-reservas">Mis reservas</button>
+      <button class="nav-btn" data-target="view-mis-consumos">Mis consumos</button>
+      <button class="help-btn" id="helpToggle" aria-expanded="false" aria-controls="helpPanel" title="Ayuda">?</button>
+    </nav>
+
+    <div class="wrap">
+      <!-- ============ Vista Reserva ============ -->
+      <section id="view-reserva" class="view active" aria-labelledby="h-reserva">
+        <header class="page-head">
+          <h1 id="h-reserva">Reserva de menú</h1>
+          <p class="campus">Casa Central Valparaíso</p>
+          <p class="lede">Elige tus días de menú vegetariano o hipocalórico consultando el detalle de platos y macronutrientes. Selecciona un menú especial para reservarlo; vuelve a presionar para retornar al general. Solo se permite reservar dentro del período actual de 2 semanas.</p>
+        </header>
+
+        <div class="legend" role="note" aria-label="Leyenda de estados">
+          <span class="legend-item"><i class="dot dot-general" aria-hidden="true"></i>Menú general (predeterminado)</span>
+          <span class="legend-item"><i class="dot dot-veg" aria-hidden="true"></i>Vegetariano reservado</span>
+          <span class="legend-item"><i class="dot dot-hipo" aria-hidden="true"></i>Hipocalórico reservado</span>
+          <span class="legend-item"><i class="dot dot-past" aria-hidden="true"></i>Día no disponible</span>
+        </div>
+
+        <main id="calendar" aria-live="polite"></main>
+
+        <div class="summary-bar" role="region" aria-label="Resumen de selección">
+          <p class="summary-text">
+            <strong id="countNum">0</strong> días con cambios pendientes <span id="countBreak"></span>
+          </p>
+          <button id="clearBtn" class="btn-ghost" disabled>Limpiar selección</button>
+          <button id="confirmBtn" class="confirm-btn" disabled>
+            <span class="btn-label">Confirmar reservas</span>
+            <span class="spinner" hidden aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ Vista Mis Reservas ============ -->
+      <section id="view-mis-reservas" class="view" aria-labelledby="h-reservas">
+        <header class="page-head" style="margin-bottom: 20px;">
+          <h1 id="h-reservas">Mis reservas</h1>
+        </header>
+
+        <div class="balance-cards">
+          <div class="balance-card">
+            <div class="title">Almuerzos</div>
+            <div class="value" data-balance="almuerzos">0</div>
+          </div>
+          <div class="balance-card">
+            <div class="title">Cenas</div>
+            <div class="value" data-balance="cenas">0</div>
+          </div>
+        </div>
+
+        <div class="info-banner">
+          <h3>Información importante</h3>
+          <ul>
+            <li>El plazo para anular una reserva es hasta las <strong>16:00 horas</strong> del día anterior a su consumo. Si la reserva tiene días consumidos, la fecha de término será actualizada.</li>
+            <li>Si anula una reserva, puede volver a generarla en la pestaña <strong>Reserva de menú</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="table-toolbar">
+          <label for="filterReservas" style="position:absolute;left:-9999px;">Buscar reserva</label>
+          <input type="search" id="filterReservas" class="form-input"
+                 placeholder="Buscar por código, fecha o menú…">
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Acción</th>
+                <th>Fecha registro</th>
+                <th>Código reserva</th>
+                <th>Fecha desde</th>
+                <th>Fecha hasta</th>
+                <th>Menú</th>
+                <th>Campus/Sede reserva</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-reservas-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ Vista Mis Consumos ============ -->
+      <section id="view-mis-consumos" class="view" aria-labelledby="h-consumos">
+        <header class="page-head" style="margin-bottom: 20px;">
+          <h1 id="h-consumos">Mis consumos</h1>
+        </header>
+
+        <div class="balance-cards">
+          <div class="balance-card">
+            <div class="title">Almuerzos</div>
+            <div class="value">4</div>
+          </div>
+          <div class="balance-card">
+            <div class="title">Cenas</div>
+            <div class="value">0</div>
+          </div>
+        </div>
+
+        <div class="info-banner">
+          <h3>Información</h3>
+          <p style="margin:0;">Se muestran los consumos de los últimos <strong>90 días</strong>.</p>
+        </div>
+
+        <div class="table-toolbar">
+          <label for="filterConsumos" style="position:absolute;left:-9999px;">Buscar consumo</label>
+          <input type="search" id="filterConsumos" class="form-input"
+                 placeholder="Buscar por fecha, comedor o menú…">
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nº</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo consumo</th>
+                <th>Campus/Sede consumo</th>
+                <th>Comedor</th>
+                <th>Menú</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-consumos-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <footer class="app-footer">
+      <a href="#">Términos y condiciones</a> ·
+      <a href="#">Política de privacidad</a> ·
+      <a href="#">Contacto: casino@usm.cl</a>
+    </footer>
+  </div>
+
+  <!-- Panel de ayuda -->
+  <aside id="helpPanel" class="help-panel" aria-hidden="true" aria-label="Ayuda del sistema">
+    <button class="help-close" id="helpClose" aria-label="Cerrar ayuda">×</button>
+    <h2>Ayuda rápida</h2>
+
+    <h3>¿Cómo reservar un menú especial?</h3>
+    <ol>
+      <li>En la pestaña <strong>Reserva de menú</strong>, elige los días que quieras cambiar.</li>
+      <li>Presiona <em>Vegetariano</em> o <em>Hipocalórico</em> (o las teclas <kbd>V</kbd> / <kbd>H</kbd> con la tarjeta enfocada).</li>
+      <li>Revisa el detalle con <em>Ver minuta y nutrición</em>.</li>
+      <li>Confirma con el botón inferior.</li>
+    </ol>
+
+    <h3>¿Cómo cambio una reserva ya confirmada?</h3>
+    <p style="font-size:0.88rem;color:var(--ink-soft);margin:6px 0 0;">
+      En un día ya reservado, presiona el <strong>otro</strong> tipo de menú. Verás un borde punteado indicando "cambio pendiente". Confirma para aplicar el cambio.
+    </p>
+
+    <h3>¿Cómo libero un día?</h3>
+    <p style="font-size:0.88rem;color:var(--ink-soft);margin:6px 0 0;">
+      Ve a <strong>Mis reservas</strong> y presiona <em>Anular</em>. El día quedará libre para una nueva selección.
+    </p>
+
+    <h3>¿Hasta cuándo puedo anular?</h3>
+    <p style="font-size:0.88rem;color:var(--ink-soft);margin:6px 0 0;">
+      Hasta las <strong>16:00 h del día anterior</strong>. Después de ese plazo la reserva se considera consumida.
+    </p>
+
+    <h3>Atajos de teclado</h3>
+    <ul>
+      <li><kbd>V</kbd> — Marcar vegetariano</li>
+      <li><kbd>H</kbd> — Marcar hipocalórico</li>
+      <li><kbd>Enter</kbd> — Expandir minuta</li>
+      <li><kbd>Esc</kbd> — Cerrar diálogos</li>
+    </ul>
+
+    <h3>¿Necesitas más ayuda?</h3>
+    <p style="font-size:0.88rem;color:var(--ink-soft);">
+      Escríbenos a <a href="mailto:casino@usm.cl">casino@usm.cl</a>
+      o acércate al mesón del casino.
+    </p>
+  </aside>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <span id="toast-msg"></span>
+    <button class="toast-close" id="toastClose" aria-label="Cerrar notificación">×</button>
+  </div>
+
+  <!-- Diálogo de confirmación -->
+  <dialog id="confirmDialog" aria-labelledby="confirmDlgTitle">
+    <div class="dialog-inner">
+      <h2 id="confirmDlgTitle">Confirmar reservas</h2>
+      <p>Revisa el resumen antes de confirmar. Esta acción generará o actualizará tus reservas.</p>
+      <ul class="dialog-list" id="confirmList"></ul>
+      <div class="dialog-actions">
+        <button class="btn-secondary" id="confirmDlgCancel" type="button">Volver</button>
+        <button class="confirm-btn" id="confirmDlgOk" type="button">
+          <span class="btn-label">Sí, confirmar</span>
+          <span class="spinner" hidden aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Diálogo de anulación -->
+  <dialog id="cancelDialog" aria-labelledby="cancelDlgTitle">
+    <div class="dialog-inner">
+      <h2 id="cancelDlgTitle">Anular reserva</h2>
+      <p id="cancelDlgBody">¿Estás seguro de que deseas anular esta reserva? Podrás volver a generarla desde "Reserva de menú".</p>
+      <div class="dialog-actions">
+        <button class="btn-secondary" id="cancelDlgCancel" type="button">Mantener</button>
+        <button class="btn-danger" id="cancelDlgOk" type="button">Sí, anular</button>
+      </div>
+    </div>
+  </dialog>
+
+<script>
+/* =========================================================
+   Utilidades de fecha
+   ========================================================= */
+const REFERENCE_TODAY = new Date(2026, 8, 1);
+
+function parseDate(str) {
+  const [d, m, y] = str.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() &&
+         a.getMonth() === b.getMonth() &&
+         a.getDate() === b.getDate();
+}
+function isToday(dateStr) { return isSameDay(parseDate(dateStr), REFERENCE_TODAY); }
+function isPast(dateStr) {
+  const d = parseDate(dateStr);
+  return d < REFERENCE_TODAY && !isSameDay(d, REFERENCE_TODAY);
+}
+function formatLongDate(str) {
+  return parseDate(str).toLocaleDateString('es-CL', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+  });
+}
+
+/* =========================================================
+   Login
+   ========================================================= */
+let currentVegStock = 14;
+let currentHipoStock = 8;
+let isLoggingIn = false;
+
+const loginForm = document.getElementById('login-form');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
+const loginBtnLabel = loginBtn.querySelector('.btn-label');
+const loginBtnSpinner = loginBtn.querySelector('.spinner');
+
+function setFieldError(input, errEl, msg) {
+  if (msg) {
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+    input.setAttribute('aria-invalid', 'true');
+  } else {
+    errEl.textContent = '';
+    errEl.classList.remove('show');
+    input.removeAttribute('aria-invalid');
+  }
+}
+
+usernameInput.addEventListener('input', () => {
+  if (/\d/.test(usernameInput.value)) {
+    setFieldError(usernameInput, document.getElementById('username-err'),
+      'El nombre de usuario no puede contener números.');
+  } else {
+    setFieldError(usernameInput, document.getElementById('username-err'), '');
+  }
+});
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (isLoggingIn) return;
+
+  let hasError = false;
+  if (!usernameInput.value.trim()) {
+    setFieldError(usernameInput, document.getElementById('username-err'),
+      'Ingresa tu nombre de usuario.');
+    hasError = true;
+  }
+  if (passwordInput.value.length < 4) {
+    setFieldError(passwordInput, document.getElementById('password-err'),
+      'La contraseña debe tener al menos 4 caracteres.');
+    hasError = true;
+  }
+  if (hasError) {
+    showToast('Revisa los campos marcados en rojo.', 'error');
+    return;
+  }
+
+  isLoggingIn = true;
+  loginBtn.disabled = true;
+  loginBtnLabel.textContent = 'Verificando…';
+  loginBtnSpinner.hidden = false;
+
+  await new Promise(r => setTimeout(r, 700));
+
+  document.getElementById('display-username').textContent = usernameInput.value.trim();
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('app-content').style.display = 'block';
+  loginBtn.disabled = false;
+  loginBtnLabel.textContent = 'Ingresar';
+  loginBtnSpinner.hidden = true;
+  isLoggingIn = false;
+
+  showToast('Sesión iniciada correctamente.', 'success');
+  renderCalendar();
+  renderReservationsTable();
+  renderConsumptionsTable();
+  updateBalances();
+});
+
+document.getElementById('logout-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('app-content').style.display = 'none';
+  document.getElementById('login-view').style.display = 'flex';
+  usernameInput.value = '';
+  passwordInput.value = '';
+  setFieldError(usernameInput, document.getElementById('username-err'), '');
+  setFieldError(passwordInput, document.getElementById('password-err'), '');
+  showToast('Sesión cerrada.', 'info');
+});
+
+setInterval(() => {
+  if (currentVegStock > 2 && Math.random() > 0.4) {
+    currentVegStock--;
+    const el = document.getElementById('stock-veg');
+    el.textContent = currentVegStock;
+    el.parentElement.style.transform = 'scale(1.05)';
+    setTimeout(() => el.parentElement.style.transform = 'scale(1)', 200);
+  }
+  if (currentHipoStock > 1 && Math.random() > 0.6) {
+    currentHipoStock--;
+    const el = document.getElementById('stock-hipo');
+    el.textContent = currentHipoStock;
+    el.parentElement.style.transform = 'scale(1.05)';
+    setTimeout(() => el.parentElement.style.transform = 'scale(1)', 200);
+  }
+}, 4000);
+
+/* =========================================================
+   Datos
+   ========================================================= */
+const MAX = { protein: 45, carbs: 105, fat: 40 };
+
+const WEEKS = [
+  {
+    label: 'Semana actual',
+    range: '31 ago – 04 sep 2026',
+    days: [
+      {
+        id: 'd0', name: 'Lunes', num: '31/08', dateStr: '31-08-2026',
+        menu: {
+          sopa: 'Crema de espárragos', entrada: 'Ensalada de apio, espinaca y zanahoria',
+          fondo: 'Chuleta escabechada con arroz perla', vegetariano: 'Fritos de coliflor con arroz perla',
+          hipocalorico: 'Mix de ensalada con carne a la cacerola', postre: 'Jalea con merengue / Yogurt / Fruta'
+        },
+        nutrition: {
+          general: { kcal: 810, protein: 38, carbs: 92, fat: 29 },
+          vegetariano: { kcal: 560, protein: 14, carbs: 84, fat: 17 },
+          hipocalorico: { kcal: 430, protein: 32, carbs: 28, fat: 16 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd1', name: 'Martes', num: '01/09', dateStr: '01-09-2026',
+        menu: {
+          sopa: 'Crema de choclo', entrada: 'Ensalada de lechuga, choclo y pimentón',
+          fondo: 'Fideos al cilantro con salsa boloñesa', vegetariano: 'Fideos al cilantro con salsa de verduras',
+          hipocalorico: 'Mix de ensalada con beef de pollo', postre: 'Jalea con crema / Flan / Fruta'
+        },
+        nutrition: {
+          general: { kcal: 760, protein: 30, carbs: 96, fat: 24 },
+          vegetariano: { kcal: 620, protein: 18, carbs: 102, fat: 14 },
+          hipocalorico: { kcal: 410, protein: 34, carbs: 22, fat: 15 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd2', name: 'Miércoles', num: '02/09', dateStr: '02-09-2026',
+        menu: {
+          sopa: '—', entrada: 'Ensalada mix toscana',
+          fondo: 'Cazuela de vacuno', vegetariano: 'Pastel de verduras',
+          hipocalorico: 'Mix de ensalada con zapallo italiano relleno', postre: 'Jalea con fruta / Arroz con leche'
+        },
+        nutrition: {
+          general: { kcal: 690, protein: 36, carbs: 58, fat: 28 },
+          vegetariano: { kcal: 540, protein: 15, carbs: 62, fat: 22 },
+          hipocalorico: { kcal: 380, protein: 20, carbs: 30, fat: 14 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd3', name: 'Jueves', num: '03/09', dateStr: '03-09-2026',
+        menu: {
+          sopa: 'Sopa de pollo con sémola', entrada: 'Ensalada de lechuga, pepino y aceituna',
+          fondo: 'Porotos con riendas y longaniza', vegetariano: 'Porotos con riendas y huevo frito',
+          hipocalorico: 'Mix de ensalada con budín de atún', postre: 'Jalea con merengue / Piña al jugo'
+        },
+        nutrition: {
+          general: { kcal: 830, protein: 40, carbs: 88, fat: 30 },
+          vegetariano: { kcal: 610, protein: 24, carbs: 78, fat: 20 },
+          hipocalorico: { kcal: 400, protein: 33, carbs: 24, fat: 15 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd4', name: 'Viernes', num: '04/09', dateStr: '04-09-2026',
+        menu: {
+          sopa: 'Consomé de vacuno', entrada: 'Ensalada de repollo, zanahoria y palmitos',
+          fondo: 'Asado alemán con arroz al curry y papas duquesas', vegetariano: 'Quiche de verduras',
+          hipocalorico: 'Mix de ensalada con asado alemán', postre: 'Jalea con crema / Sémola con leche'
+        },
+        nutrition: {
+          general: { kcal: 890, protein: 42, carbs: 84, fat: 36 },
+          vegetariano: { kcal: 570, protein: 19, carbs: 52, fat: 30 },
+          hipocalorico: { kcal: 440, protein: 35, carbs: 26, fat: 18 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      }
+    ]
+  },
+  {
+    label: 'Próxima semana',
+    range: '07 – 11 sep 2026',
+    days: [
+      {
+        id: 'd5', name: 'Lunes', num: '07/09', dateStr: '07-09-2026',
+        menu: {
+          sopa: 'Crema de zapallo', entrada: 'Ensalada de tomate y cebolla',
+          fondo: 'Pollo arvejado con puré', vegetariano: 'Guiso de lentejas',
+          hipocalorico: 'Mix de ensalada con pollo grillé', postre: 'Ensalada de frutas'
+        },
+        nutrition: {
+          general: { kcal: 720, protein: 39, carbs: 68, fat: 24 },
+          vegetariano: { kcal: 540, protein: 22, carbs: 78, fat: 12 },
+          hipocalorico: { kcal: 390, protein: 36, carbs: 20, fat: 12 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd6', name: 'Martes', num: '08/09', dateStr: '08-09-2026',
+        menu: {
+          sopa: 'Consomé de ave', entrada: 'Ensalada césar',
+          fondo: 'Lasaña de carne', vegetariano: 'Lasaña de verduras',
+          hipocalorico: 'Mix de ensalada con salmón', postre: 'Flan de vainilla'
+        },
+        nutrition: {
+          general: { kcal: 810, protein: 34, carbs: 82, fat: 34 },
+          vegetariano: { kcal: 600, protein: 20, carbs: 76, fat: 22 },
+          hipocalorico: { kcal: 420, protein: 34, carbs: 18, fat: 20 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd7', name: 'Miércoles', num: '09/09', dateStr: '09-09-2026',
+        menu: {
+          sopa: 'Crema de tomate', entrada: 'Ensalada mixta',
+          fondo: 'Pastel de choclo', vegetariano: 'Pastel de choclo vegetariano',
+          hipocalorico: 'Mix de ensalada con pavo', postre: 'Mousse de maracuyá'
+        },
+        nutrition: {
+          general: { kcal: 750, protein: 28, carbs: 90, fat: 26 },
+          vegetariano: { kcal: 560, protein: 14, carbs: 92, fat: 16 },
+          hipocalorico: { kcal: 380, protein: 32, carbs: 20, fat: 12 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd8', name: 'Jueves', num: '10/09', dateStr: '10-09-2026',
+        menu: {
+          sopa: 'Sopa minestrone', entrada: 'Ensalada de repollo morado',
+          fondo: 'Merluza al horno con puré', vegetariano: 'Curry de garbanzos',
+          hipocalorico: 'Mix de ensalada con merluza', postre: 'Gelatina con fruta'
+        },
+        nutrition: {
+          general: { kcal: 640, protein: 38, carbs: 58, fat: 20 },
+          vegetariano: { kcal: 580, protein: 18, carbs: 80, fat: 18 },
+          hipocalorico: { kcal: 360, protein: 33, carbs: 18, fat: 10 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      },
+      {
+        id: 'd9', name: 'Viernes', num: '11/09', dateStr: '11-09-2026',
+        menu: {
+          sopa: 'Crema de champiñones', entrada: 'Ensalada griega',
+          fondo: 'Asado a la cacerola con arroz', vegetariano: 'Risotto de verduras',
+          hipocalorico: 'Mix de ensalada con asado', postre: 'Sémola con leche'
+        },
+        nutrition: {
+          general: { kcal: 860, protein: 41, carbs: 80, fat: 34 },
+          vegetariano: { kcal: 610, protein: 15, carbs: 96, fat: 18 },
+          hipocalorico: { kcal: 430, protein: 34, carbs: 22, fat: 17 }
+        },
+        reserved: null, special: null, expanded: false, tab: 'general'
+      }
+    ]
+  }
+];
+
+let userReservations = [];
+let filterReservasText = '';
+let filterConsumosText = '';
+
+const userConsumptions = [
+  { n: 1, fecha: '01-09-2026', hora: '12:05', tipo: 'Almuerzo', sede: 'Casa Central Valparaíso', comedor: 'Comedor Central', menu: 'Común' },
+  { n: 2, fecha: '11-08-2026', hora: '12:15', tipo: 'Almuerzo', sede: 'Casa Central Valparaíso', comedor: 'Comedor Central', menu: 'Común' },
+  { n: 3, fecha: '17-06-2026', hora: '11:31', tipo: 'Almuerzo', sede: 'Casa Central Valparaíso', comedor: 'Comedor Central', menu: 'Común' }
+];
+
+/* =========================================================
+   Navegación
+   ========================================================= */
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+
+function goToReserva() {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelector('[data-target="view-reserva"]').classList.add('active');
+  document.getElementById('view-reserva').classList.add('active');
+}
+
+/* =========================================================
+   Render del calendario
+   ========================================================= */
+function findDay(id) {
+  for (const w of WEEKS) for (const d of w.days) if (d.id === id) return d;
+  return null;
+}
+
+function pct(val, max) {
+  return Math.max(6, Math.min(100, Math.round(val / max * 100)));
+}
+
+function dayStatusText(day) {
+  if (isPast(day.dateStr)) return 'Este día ya pasó';
+
+  const labels = { vegetariano: 'vegetariano', hipocalorico: 'hipocalórico' };
+
+  if (day.reserved && day.special && day.special !== day.reserved) {
+    return `Cambio pendiente: de ${labels[day.reserved]} a ${labels[day.special]}`;
+  }
+  if (day.reserved) {
+    return `Reservado — menú ${labels[day.reserved]}`;
+  }
+  if (day.special) {
+    return `Seleccionado — menú ${labels[day.special]} (por confirmar)`;
+  }
+  return 'Menú general (por defecto)';
+}
+
+function macroRow(label, value, max, hint) {
+  return `<div class="macro-row">
+    <span class="macro-label" title="${hint || ''}">${label}</span>
+    <div class="bar"><span style="width:${pct(value, max)}%"></span></div>
+    <span class="macro-val">${value} g</span>
+  </div>`;
+}
+
+function nutritionBlock(day) {
+  const n = day.nutrition[day.tab];
+  const labels = { general: 'General', vegetariano: 'Vegetariano', hipocalorico: 'Hipocalórico' };
+  const tabs = ['general', 'vegetariano', 'hipocalorico'].map(t =>
+    `<button class="tab-btn ${day.tab === t ? 'active' : ''}"
+             role="tab"
+             aria-selected="${day.tab === t}"
+             data-action="tab" data-id="${day.id}" data-tab="${t}">${labels[t]}</button>`
+  ).join('');
+
+  return `<div class="nutrition-tabs" role="tablist" aria-label="Tipo de menú">${tabs}</div>
+    <div class="nutrition-values">
+      <div class="kcal-value">${n.kcal} <span>kcal</span></div>
+      ${macroRow('Proteínas', n.protein, MAX.protein, 'Referencia diaria: 45 g')}
+      ${macroRow('Carbohidratos', n.carbs, MAX.carbs, 'Referencia diaria: 105 g')}
+      ${macroRow('Grasas', n.fat, MAX.fat, 'Referencia diaria: 40 g')}
+    </div>`;
+}
+
+function dayCard(day) {
+  const past = isPast(day.dateStr);
+  const today = isToday(day.dateStr);
+  const hasPendingChange = day.reserved && day.special && day.special !== day.reserved;
+
+  let stateClass = '';
+  if (past) stateClass = 'is-past';
+  else if (day.reserved) stateClass = 'is-reserved-' + (day.reserved === 'vegetariano' ? 'veg' : 'hipo');
+  else if (day.special) stateClass = 'is-' + day.special;
+
+  if (hasPendingChange) stateClass += ' has-pending';
+
+  // Badges
+  let badge = '';
+  if (today) {
+    badge = '<span class="badge badge-today">Hoy</span>';
+  } else if (past) {
+    badge = '<span class="badge badge-past">Pasado</span>';
+  } else if (day.reserved) {
+    const cls = day.reserved === 'hipocalorico' ? 'badge-reserved hipo' : 'badge-reserved';
+    badge = `<span class="badge ${cls}">Reservado</span>`;
+  }
+  if (hasPendingChange) {
+    badge += ' <span class="badge badge-change">Cambio pendiente</span>';
+  }
+
+  const activeType = day.special || day.reserved;
+
+  const pendingVeg  = day.special === 'vegetariano' && day.reserved && day.reserved !== 'vegetariano';
+  const pendingHipo = day.special === 'hipocalorico' && day.reserved && day.reserved !== 'hipocalorico';
+
+  const actions = past ? '' :
+    `<div class="day-actions">
+      <button class="toggle toggle-veg ${activeType === 'vegetariano' ? 'active' : ''} ${pendingVeg ? 'pending' : ''}"
+              data-action="toggle" data-id="${day.id}" data-type="vegetariano"
+              aria-pressed="${activeType === 'vegetariano'}"
+              aria-label="Marcar como vegetariano el ${day.name} ${day.num}">
+        🌱 Vegetariano
+      </button>
+      <button class="toggle toggle-hipo ${activeType === 'hipocalorico' ? 'active' : ''} ${pendingHipo ? 'pending' : ''}"
+              data-action="toggle" data-id="${day.id}" data-type="hipocalorico"
+              aria-pressed="${activeType === 'hipocalorico'}"
+              aria-label="Marcar como hipocalórico el ${day.name} ${day.num}">
+        🥗 Hipocalórico
+      </button>
+    </div>`;
+
+  const detail = `<div class="day-detail" ${day.expanded ? '' : 'hidden'}>
+    <div class="menu-block">
+      <h3>Platos del día</h3>
+      <dl>
+        <dt>Sopa</dt><dd>${day.menu.sopa}</dd>
+        <dt>Entrada</dt><dd>${day.menu.entrada}</dd>
+        <dt>Fondo</dt><dd>${day.menu.fondo}</dd>
+        <dt>Vegetariano</dt><dd>${day.menu.vegetariano}</dd>
+        <dt>Hipocalórico</dt><dd>${day.menu.hipocalorico}</dd>
+        <dt>Postre</dt><dd>${day.menu.postre}</dd>
+      </dl>
+    </div>
+    <div class="nutrition-block">
+      <h3>Aporte nutricional</h3>
+      ${nutritionBlock(day)}
+    </div>
+  </div>`;
+
+  return `<article class="day-card ${stateClass}"
+                   data-day-id="${day.id}"
+                   tabindex="0"
+                   aria-label="${day.name} ${day.num} — ${dayStatusText(day)}">
+    <div class="day-top">
+      <div class="day-date">
+        <span class="day-name">${day.name}</span>
+        <span class="day-num">${day.num}</span>
+      </div>
+      ${badge}
+    </div>
+    <p class="day-preview"><strong>Fondo:</strong> ${day.menu.fondo}</p>
+    ${actions}
+    <p class="day-status">${dayStatusText(day)}</p>
+    <button class="expand-btn" data-action="expand" data-id="${day.id}"
+            aria-expanded="${day.expanded}">
+      ${day.expanded ? 'Ocultar minuta y nutrición' : 'Ver minuta y nutrición'}
+      <svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    ${detail}
+  </article>`;
+}
+
+function weekSection(week) {
+  return `<section class="week">
+    <div class="week-head">
+      <h2>${week.label}</h2>
+      <span class="week-range">${week.range}</span>
+      <div class="week-actions">
+        <button class="week-quick" data-week-action="all-veg" data-week="${week.label}"
+                title="Marcar toda la semana como vegetariano">Toda veg</button>
+        <button class="week-quick" data-week-action="all-hipo" data-week="${week.label}"
+                title="Marcar toda la semana como hipocalórico">Toda hipo</button>
+        <button class="week-quick" data-week-action="clear" data-week="${week.label}"
+                title="Limpiar selección pendiente de esta semana">Limpiar</button>
+      </div>
+    </div>
+    <div class="day-grid">${week.days.map(dayCard).join('')}</div>
+  </section>`;
+}
+
+function renderCalendar() {
+  document.getElementById('calendar').innerHTML = WEEKS.map(weekSection).join('');
+  updateSummary();
+}
+
+function updateSummary() {
+  let newCount = 0, changeCount = 0;
+  WEEKS.forEach(w => w.days.forEach(d => {
+    if (isPast(d.dateStr)) return;
+    if (!d.special) return;
+    if (d.reserved && d.special !== d.reserved) changeCount++;
+    else if (!d.reserved) newCount++;
+  }));
+  const total = newCount + changeCount;
+  document.getElementById('countNum').textContent = total;
+
+  const parts = [];
+  if (newCount) parts.push(`${newCount} nueva${newCount !== 1 ? 's' : ''}`);
+  if (changeCount) parts.push(`${changeCount} cambio${changeCount !== 1 ? 's' : ''}`);
+  document.getElementById('countBreak').textContent = parts.length ? `(${parts.join(', ')})` : '';
+
+  document.getElementById('confirmBtn').disabled = total === 0;
+  document.getElementById('clearBtn').disabled = total === 0;
+}
+
+/* =========================================================
+   Interacciones del calendario
+   ========================================================= */
+const calendarEl = document.getElementById('calendar');
+
+function handleToggle(day, type) {
+  if (isPast(day.dateStr)) return;
+  const labels = { vegetariano: 'vegetariano', hipocalorico: 'hipocalórico' };
+
+  // Día con reserva confirmada
+  if (day.reserved) {
+    if (type === day.reserved) {
+      if (day.special && day.special !== day.reserved) {
+        day.special = null;
+        renderCalendar();
+        showToast(`Cambio cancelado. Se mantiene ${labels[day.reserved]}.`, 'info');
+      } else {
+        showToast(`Este día ya está reservado como ${labels[day.reserved]}. Usa "Anular" en Mis reservas para liberarlo.`, 'info');
+      }
+      return;
+    }
+    // Clic en el OTRO tipo → cambio pendiente
+    if (day.special === type) return;
+    day.special = type;
+    renderCalendar();
+    showToast(`Cambio pendiente a ${labels[type]}. Confirma para aplicarlo.`, 'info');
+    return;
+  }
+
+  // Día sin reserva: toggle normal
+  day.special = (day.special === type) ? null : type;
+  renderCalendar();
+  if (day.special) {
+    showToast(`Menú ${labels[day.special]} seleccionado para el ${day.name} ${day.num}.`, 'info');
+  }
+}
+
+calendarEl.addEventListener('click', (e) => {
+  const quick = e.target.closest('.week-quick');
+  if (quick) {
+    handleWeekAction(quick.dataset.weekAction, quick.dataset.week);
+    return;
+  }
+
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const day = findDay(btn.dataset.id);
+  if (!day) return;
+
+  if (action === 'toggle') {
+    handleToggle(day, btn.dataset.type);
+  } else if (action === 'expand') {
+    day.expanded = !day.expanded;
+    renderCalendar();
+  } else if (action === 'tab') {
+    day.tab = btn.dataset.tab;
+    renderCalendar();
+  }
+});
+
+calendarEl.addEventListener('keydown', (e) => {
+  const card = e.target.closest('.day-card');
+  if (!card) return;
+  const day = findDay(card.dataset.dayId);
+  if (!day || isPast(day.dateStr)) return;
+
+  if (e.key === 'v' || e.key === 'V') {
+    e.preventDefault();
+    handleToggle(day, 'vegetariano');
+    focusDay(day.id);
+  } else if (e.key === 'h' || e.key === 'H') {
+    e.preventDefault();
+    handleToggle(day, 'hipocalorico');
+    focusDay(day.id);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    day.expanded = !day.expanded;
+    renderCalendar();
+    focusDay(day.id);
+  }
+});
+
+function focusDay(id) {
+  requestAnimationFrame(() => {
+    const el = document.querySelector(`.day-card[data-day-id="${id}"]`);
+    if (el) el.focus();
+  });
+}
+
+function handleWeekAction(action, weekLabel) {
+  const week = WEEKS.find(w => w.label === weekLabel);
+  if (!week) return;
+
+  week.days.forEach(d => {
+    if (isPast(d.dateStr)) return;
+    if (action === 'all-veg') {
+      if (d.reserved === 'vegetariano') {
+        d.special = null;
+      } else {
+        d.special = 'vegetariano';
+      }
+    } else if (action === 'all-hipo') {
+      if (d.reserved === 'hipocalorico') {
+        d.special = null;
+      } else {
+        d.special = 'hipocalorico';
+      }
+    } else if (action === 'clear') {
+      d.special = null;
+    }
+  });
+
+  renderCalendar();
+  const msgMap = {
+    'all-veg': `Toda la "${weekLabel}" marcada como vegetariano.`,
+    'all-hipo': `Toda la "${weekLabel}" marcada como hipocalórico.`,
+    'clear': `Selección pendiente de "${weekLabel}" limpiada.`
+  };
+  showToast(msgMap[action], 'info');
+}
+
+/* =========================================================
+   Limpiar selección pendiente
+   ========================================================= */
+document.getElementById('clearBtn').addEventListener('click', () => {
+  WEEKS.forEach(w => w.days.forEach(d => { if (!isPast(d.dateStr)) d.special = null; }));
+  renderCalendar();
+  showToast('Selección pendiente limpiada.', 'info');
+});
+
+/* =========================================================
+   Confirmar reservas con diálogo de resumen
+   ========================================================= */
+const confirmDialog = document.getElementById('confirmDialog');
+const confirmList = document.getElementById('confirmList');
+const confirmDlgOk = document.getElementById('confirmDlgOk');
+const confirmDlgCancel = document.getElementById('confirmDlgCancel');
+
+document.getElementById('confirmBtn').addEventListener('click', () => {
+  const newItems = [];
+  const changeItems = [];
+
+  WEEKS.forEach(w => w.days.forEach(d => {
+    if (isPast(d.dateStr)) return;
+    if (!d.special) return;
+    if (d.reserved && d.special !== d.reserved) changeItems.push(d);
+    else if (!d.reserved) newItems.push(d);
+  }));
+
+  if (newItems.length === 0 && changeItems.length === 0) return;
+
+  const rows = [];
+  newItems.forEach(d => {
+    const cls = d.special === 'vegetariano' ? 'tag-veg' : 'tag-hipo';
+    const label = d.special === 'vegetariano' ? 'Vegetariano' : 'Hipocalórico';
+    rows.push(`<li>
+      <span><strong>Nueva:</strong> ${d.name} ${d.num} — ${formatLongDate(d.dateStr)}</span>
+      <span class="tag ${cls}">${label}</span>
+    </li>`);
+  });
+  changeItems.forEach(d => {
+    const cls = d.special === 'vegetariano' ? 'tag-veg' : 'tag-hipo';
+    const label = d.special === 'vegetariano' ? 'Vegetariano' : 'Hipocalórico';
+    const prev = d.reserved === 'vegetariano' ? 'Vegetariano' : 'Hipocalórico';
+    rows.push(`<li>
+      <span><strong>Cambio:</strong> ${d.name} ${d.num} — ${prev} →</span>
+      <span class="tag ${cls}">${label}</span>
+    </li>`);
+  });
+
+  confirmList.innerHTML = rows.join('');
+  confirmDialog.showModal();
+});
+
+confirmDlgCancel.addEventListener('click', () => confirmDialog.close());
+
+confirmDlgOk.addEventListener('click', async () => {
+  const spinner = confirmDlgOk.querySelector('.spinner');
+  const label = confirmDlgOk.querySelector('.btn-label');
+  confirmDlgOk.disabled = true;
+  label.textContent = 'Procesando…';
+  spinner.hidden = false;
+
+  await new Promise(r => setTimeout(r, 500));
+
+  const now = REFERENCE_TODAY;
+  const todayStr = now.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  let newCount = 0, changeCount = 0;
+
+  WEEKS.forEach(w => w.days.forEach(d => {
+    if (isPast(d.dateStr)) return;
+    if (!d.special) return;
+
+    const suffix = d.special === 'vegetariano' ? 'VEG' : 'HIPO';
+    const [dd, mm, yyyy] = d.dateStr.split('-');
+    const code = `RES-${yyyy}-${mm}-${dd}-${suffix}`;
+
+    if (d.reserved && d.special !== d.reserved) {
+      const existing = userReservations.find(r => r.dayId === d.id);
+      if (existing) {
+        existing.menu = d.special === 'vegetariano' ? 'Vegetariano' : 'Hipocalórico';
+        existing.codigo = code;
+        existing.fechaRegistro = todayStr;
+      }
+      d.reserved = d.special;
+      d.special = null;
+      changeCount++;
+    } else if (!d.reserved) {
+      userReservations.push({
+        id: code + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
+        fechaRegistro: todayStr,
+        codigo: code,
+        fechaDesde: d.dateStr,
+        fechaHasta: d.dateStr,
+        menu: d.special === 'vegetariano' ? 'Vegetariano' : 'Hipocalórico',
+        campus: 'Casa Central Valparaíso',
+        dayId: d.id
+      });
+      d.reserved = d.special;
+      d.special = null;
+      newCount++;
+    }
+  }));
+
+  renderCalendar();
+  renderReservationsTable();
+  updateBalances();
+
+  confirmDlgOk.disabled = false;
+  label.textContent = 'Sí, confirmar';
+  spinner.hidden = true;
+  confirmDialog.close();
+
+  const parts = [];
+  if (newCount) parts.push(`${newCount} nueva${newCount !== 1 ? 's' : ''}`);
+  if (changeCount) parts.push(`${changeCount} cambio${changeCount !== 1 ? 's' : ''}`);
+  showToast(`Reservas actualizadas: ${parts.join(', ')}.`, 'success');
+
+  setTimeout(() => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelector('[data-target="view-mis-reservas"]').classList.add('active');
+    document.getElementById('view-mis-reservas').classList.add('active');
+  }, 600);
+});
+
+/* =========================================================
+   Tabla de reservas
+   ========================================================= */
+function renderReservationsTable() {
+  const tbody = document.getElementById('tbl-reservas-body');
+  const filtered = userReservations.filter(r => {
+    if (!filterReservasText) return true;
+    const q = filterReservasText.toLowerCase();
+    return r.codigo.toLowerCase().includes(q)
+        || r.menu.toLowerCase().includes(q)
+        || r.fechaDesde.includes(q)
+        || r.fechaHasta.includes(q);
+  });
+
+  if (userReservations.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-row">
+      <div class="empty-state">
+        <p>Aún no tienes reservas activas.</p>
+        <button class="btn-primary-sm" id="emptyGoReserva">Ir a Reserva de menú</button>
+      </div>
+    </td></tr>`;
+    const b = document.getElementById('emptyGoReserva');
+    if (b) b.addEventListener('click', goToReserva);
+    return;
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-row">No hay reservas que coincidan con "${filterReservasText}".</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => `
+    <tr>
+      <td>
+        <button class="btn-cancel"
+                data-id="${r.id}"
+                data-day-id="${r.dayId}">Anular</button>
+      </td>
+      <td>${r.fechaRegistro}</td>
+      <td><strong>${r.codigo}</strong></td>
+      <td>${formatLongDate(r.fechaDesde)}</td>
+      <td>${formatLongDate(r.fechaHasta)}</td>
+      <td>${r.menu}</td>
+      <td>${r.campus}</td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('tbl-reservas-body').addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-cancel');
+  if (!btn) return;
+  openCancelDialog(btn.dataset.id, btn.dataset.dayId);
+});
+
+document.getElementById('filterReservas').addEventListener('input', (e) => {
+  filterReservasText = e.target.value.trim();
+  renderReservationsTable();
+});
+
+/* =========================================================
+   Diálogo de anulación
+   ========================================================= */
+const cancelDialog = document.getElementById('cancelDialog');
+let pendingCancel = null;
+
+function openCancelDialog(resId, dayId) {
+  pendingCancel = { resId, dayId };
+  cancelDialog.showModal();
+}
+
+document.getElementById('cancelDlgCancel').addEventListener('click', () => {
+  pendingCancel = null;
+  cancelDialog.close();
+});
+
+document.getElementById('cancelDlgOk').addEventListener('click', () => {
+  if (pendingCancel) {
+    userReservations = userReservations.filter(r => r.id !== pendingCancel.resId);
+    const day = findDay(pendingCancel.dayId);
+    if (day) {
+      day.reserved = null;
+      day.special = null;
+    }
+    renderCalendar();
+    renderReservationsTable();
+    updateBalances();
+    showToast('Reserva anulada. El día quedó libre para una nueva selección.', 'success');
+  }
+  pendingCancel = null;
+  cancelDialog.close();
+});
+
+/* =========================================================
+   Tabla de consumos
+   ========================================================= */
+function renderConsumptionsTable() {
+  const tbody = document.getElementById('tbl-consumos-body');
+  const filtered = userConsumptions.filter(c => {
+    if (!filterConsumosText) return true;
+    const q = filterConsumosText.toLowerCase();
+    return c.fecha.includes(q)
+        || c.comedor.toLowerCase().includes(q)
+        || c.menu.toLowerCase().includes(q)
+        || c.sede.toLowerCase().includes(q);
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-row">No hay consumos que coincidan con la búsqueda.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(c => `
+    <tr>
+      <td>${c.n}</td>
+      <td>${formatLongDate(c.fecha)}</td>
+      <td>${c.hora}</td>
+      <td>${c.tipo}</td>
+      <td>${c.sede}</td>
+      <td>${c.comedor}</td>
+      <td>${c.menu}</td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('filterConsumos').addEventListener('input', (e) => {
+  filterConsumosText = e.target.value.trim();
+  renderConsumptionsTable();
+});
+
+/* =========================================================
+   Contadores dinámicos
+   ========================================================= */
+function updateBalances() {
+  const almuerzos = userReservations.length + userConsumptions.length;
+  document.querySelectorAll('[data-balance="almuerzos"]').forEach(el => {
+    el.textContent = almuerzos;
+  });
+}
+
+/* =========================================================
+   Toast
+   ========================================================= */
+const toastEl = document.getElementById('toast');
+const toastMsg = document.getElementById('toast-msg');
+let toastTimer;
+
+function showToast(msg, variant = 'info') {
+  toastMsg.textContent = msg;
+  toastEl.classList.remove('toast-success', 'toast-error', 'toast-info');
+  toastEl.classList.add('toast-' + variant);
+  toastEl.hidden = false;
+  requestAnimationFrame(() => toastEl.classList.add('show'));
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, 3500);
+}
+
+function hideToast() {
+  toastEl.classList.remove('show');
+  setTimeout(() => { toastEl.hidden = true; }, 300);
+}
+
+document.getElementById('toastClose').addEventListener('click', () => {
+  clearTimeout(toastTimer);
+  hideToast();
+});
+
+/* =========================================================
+   Panel de ayuda
+   ========================================================= */
+const helpPanel = document.getElementById('helpPanel');
+const helpToggle = document.getElementById('helpToggle');
+
+helpToggle.addEventListener('click', () => {
+  const open = helpPanel.classList.toggle('open');
+  helpPanel.setAttribute('aria-hidden', String(!open));
+  helpToggle.setAttribute('aria-expanded', String(open));
+});
+
+document.getElementById('helpClose').addEventListener('click', () => {
+  helpPanel.classList.remove('open');
+  helpPanel.setAttribute('aria-hidden', 'true');
+  helpToggle.setAttribute('aria-expanded', 'false');
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && helpPanel.classList.contains('open')) {
+    helpPanel.classList.remove('open');
+    helpPanel.setAttribute('aria-hidden', 'true');
+    helpToggle.setAttribute('aria-expanded', 'false');
+  }
+});
+
+/* =========================================================
+   Inicialización
+   ========================================================= */
+renderCalendar();
+renderReservationsTable();
+renderConsumptionsTable();
+updateBalances();
+</script>
+</body>
+</html>
