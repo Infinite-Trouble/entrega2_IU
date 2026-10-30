@@ -475,6 +475,32 @@
     gap: 14px;
   }
 
+  /* ---------- Acordeón Días Anteriores ---------- */
+  .past-days-accordion {
+    margin-bottom: 14px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .past-days-accordion summary {
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    user-select: none;
+  }
+  .past-days-accordion summary:hover {
+    color: var(--ink);
+  }
+  .past-days-accordion[open] summary {
+    border-bottom: 1px solid var(--border);
+  }
+  .past-days-accordion[open] .day-grid {
+    padding: 14px;
+  }
+
   /* ---------- Tarjeta de Día ---------- */
   .day-card {
     background: var(--white);

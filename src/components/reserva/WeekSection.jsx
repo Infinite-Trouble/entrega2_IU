@@ -1,5 +1,6 @@
 import React from 'react';
 import DayCard from './DayCard';
+import { isPast } from '../../utils/dateUtils';
 
 export default function WeekSection({
   week,
@@ -8,6 +9,9 @@ export default function WeekSection({
   onChangeTab,
   onWeekAction,
 }) {
+  const pastDays = week.days.filter((day) => isPast(day.dateStr));
+  const currentDays = week.days.filter((day) => !isPast(day.dateStr));
+
   return (
     <section className="week">
       <div className="week-head">
@@ -40,17 +44,37 @@ export default function WeekSection({
           </button>
         </div>
       </div>
-      <div className="day-grid">
-        {week.days.map((day) => (
-          <DayCard
-            key={day.id}
-            day={day}
-            onToggleMenu={onToggleMenu}
-            onToggleExpand={onToggleExpand}
-            onChangeTab={onChangeTab}
-          />
-        ))}
-      </div>
+
+      {pastDays.length > 0 && (
+        <details className="past-days-accordion">
+          <summary>Días anteriores ({pastDays.length})</summary>
+          <div className="day-grid">
+            {pastDays.map((day) => (
+              <DayCard
+                key={day.id}
+                day={day}
+                onToggleMenu={onToggleMenu}
+                onToggleExpand={onToggleExpand}
+                onChangeTab={onChangeTab}
+              />
+            ))}
+          </div>
+        </details>
+      )}
+
+      {currentDays.length > 0 && (
+        <div className="day-grid">
+          {currentDays.map((day) => (
+            <DayCard
+              key={day.id}
+              day={day}
+              onToggleMenu={onToggleMenu}
+              onToggleExpand={onToggleExpand}
+              onChangeTab={onChangeTab}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

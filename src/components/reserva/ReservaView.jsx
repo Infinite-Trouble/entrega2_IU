@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WeekSection from './WeekSection';
 import ConfirmModal from './ConfirmModal';
 import { isPast } from '../../utils/dateUtils';
@@ -14,6 +14,14 @@ export default function ReservaView({
 }) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const todayCard = document.querySelector('.badge-today')?.closest('.day-card');
+    if (todayCard) {
+      todayCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      todayCard.focus();
+    }
+  }, []);
 
   // Compute pending summary
   const newItems = [];

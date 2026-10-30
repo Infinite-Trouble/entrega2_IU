@@ -31,7 +31,7 @@ export default function DayDetail({ day, onChangeTab }) {
   return (
     <div className="day-detail">
       <div className="menu-block">
-        <h3>Platos del día</h3>
+        <h3>Minuta del {day.name.toLowerCase()} {day.num}</h3>
         <dl>
           <dt>Sopa</dt>
           <dd>{day.menu.sopa}</dd>
