@@ -547,15 +547,49 @@
   .badge-reserved.hipo { background: var(--hipo); }
   .badge-change { background: var(--danger); color: var(--white); }
 
-  .day-preview {
-    margin: 0;
-    font-size: 0.85rem;
+  
+  .day-menus {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .day-menu-row {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+    align-items: start;
+    gap: 6px;
+    padding: 6px 7px;
+    border-radius: 6px;
+    background: var(--bg-panel);
+  }
+
+  .day-menu-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  .day-menu-dish {
+    font-size: 0.76rem;
+    line-height: 1.3;
     color: var(--ink);
-    min-height: 2.4em;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  }
+
+  .day-menu-row.vegetarian {
+    background: var(--veg-soft);
+  }
+
+  .day-menu-row.vegetarian .day-menu-label {
+    color: var(--veg);
+  }
+
+  .day-menu-row.hipocaloric {
+    background: var(--hipo-soft);
+  }
+
+  .day-menu-row.hipocaloric .day-menu-label {
+    color: var(--hipo);
   }
 
   .day-actions { display: flex; gap: 6px; flex-wrap: wrap; }

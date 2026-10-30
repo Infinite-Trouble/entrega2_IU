@@ -103,9 +103,25 @@ export default function DayCard({
         )}
       </div>
 
-      <p className="day-preview">
-        <strong>Fondo:</strong> {day.menu.fondo}
-      </p>
+      <div
+        className="day-menus"
+        aria-label={`Menús disponibles para ${day.name} ${day.num}`}
+      >
+        <div className="day-menu-row general">
+          <span className="day-menu-label">General</span>
+          <span className="day-menu-dish">{day.menu.fondo}</span>
+        </div>
+
+        <div className="day-menu-row vegetarian">
+          <span className="day-menu-label">Veg 🌱</span>
+          <span className="day-menu-dish">{day.menu.vegetariano}</span>
+        </div>
+
+        <div className="day-menu-row hipocaloric">
+          <span className="day-menu-label">Hipo 🥗</span>
+          <span className="day-menu-dish">{day.menu.hipocalorico}</span>
+        </div>
+      </div>
 
       {!past && (
         <div className="day-actions">
