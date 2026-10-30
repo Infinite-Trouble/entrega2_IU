@@ -21,9 +21,13 @@ function getDayStatusText(day) {
 
 export default function DayCard({
   day,
+  isDragInRange,
+  isDragEndpoint,
   onToggleMenu,
   onToggleExpand,
   onChangeTab,
+  onDragStart,
+  onDragEnter,
 }) {
   const cardRef = useRef(null);
   const past = isPast(day.dateStr);
@@ -44,6 +48,14 @@ export default function DayCard({
 
   if (hasPendingChange) {
     stateClasses.push('has-pending');
+  }
+  
+  // Clases exclusivas para el momento en el que el mouse se arrastra
+  if (isDragInRange) {
+    stateClasses.push('in-drag-range');
+  }
+  if (isDragEndpoint) {
+    stateClasses.push('drag-endpoint');
   }
 
   const activeType = day.special || day.reserved;
@@ -73,6 +85,18 @@ export default function DayCard({
     }
   };
 
+  // Si pincha en cualquier parte vacía de la tarjeta, marcamos vegetariano por defecto
+  const handleCardClick = (e) => {
+    if (past || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+    onToggleMenu(day.id, 'vegetariano', e.shiftKey);
+  };
+
+  const handleCardMouseDown = (e) => {
+    if (past || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+    e.preventDefault(); // Evita selección de texto durante el arrastre
+    if (onDragStart) onDragStart(day.id, 'vegetariano');
+  };
+
   return (
     <article
       ref={cardRef}
@@ -81,6 +105,12 @@ export default function DayCard({
       tabIndex={0}
       aria-label={`${day.name} ${day.num} — ${getDayStatusText(day)}`}
       onKeyDown={handleKeyDown}
+      onClick={handleCardClick}
+      onMouseDown={handleCardMouseDown}
+      onMouseEnter={() => {
+        if (!past && onDragEnter) onDragEnter(day.id);
+      }}
+      style={{ cursor: past ? 'default' : 'pointer' }}
     >
       <div className="day-top">
         <div className="day-date">
@@ -132,7 +162,12 @@ export default function DayCard({
             } ${pendingVeg ? 'pending' : ''}`}
             aria-pressed={activeType === 'vegetariano'}
             aria-label={`Marcar como vegetariano el ${day.name} ${day.num}`}
-            onClick={() => onToggleMenu(day.id, 'vegetariano')}
+            onClick={(e) => onToggleMenu(day.id, 'vegetariano', e.shiftKey)}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (onDragStart) onDragStart(day.id, 'vegetariano');
+            }}
           >
             🌱 Vegetariano
           </button>
@@ -143,7 +178,12 @@ export default function DayCard({
             } ${pendingHipo ? 'pending' : ''}`}
             aria-pressed={activeType === 'hipocalorico'}
             aria-label={`Marcar como hipocalórico el ${day.name} ${day.num}`}
-            onClick={() => onToggleMenu(day.id, 'hipocalorico')}
+            onClick={(e) => onToggleMenu(day.id, 'hipocalorico', e.shiftKey)}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (onDragStart) onDragStart(day.id, 'hipocalorico');
+            }}
           >
             🥗 Hipocalórico
           </button>
@@ -156,7 +196,10 @@ export default function DayCard({
         type="button"
         className="expand-btn"
         aria-expanded={day.expanded}
-        onClick={() => onToggleExpand(day.id)}
+        onClick={(e) => {
+          e.stopPropagation(); // Evita que se marque vegetariano por error al abrir
+          onToggleExpand(day.id);
+        }}
       >
         {day.expanded ? 'Ocultar minuta y nutrición' : 'Ver minuta y nutrición'}
         <svg
@@ -177,7 +220,11 @@ export default function DayCard({
         </svg>
       </button>
 
-      {day.expanded && <DayDetail day={day} onChangeTab={onChangeTab} />}
+      {day.expanded && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <DayDetail day={day} onChangeTab={onChangeTab} />
+        </div>
+      )}
     </article>
   );
 }

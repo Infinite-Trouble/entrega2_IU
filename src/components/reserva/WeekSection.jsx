@@ -4,10 +4,14 @@ import { isPast } from '../../utils/dateUtils';
 
 export default function WeekSection({
   week,
+  dragState,
+  activeDragIds,
   onToggleMenu,
   onToggleExpand,
   onChangeTab,
   onWeekAction,
+  onDragStart,
+  onDragEnter,
 }) {
   const pastDays = week.days.filter((day) => isPast(day.dateStr));
   const currentDays = week.days.filter((day) => !isPast(day.dateStr));
@@ -53,9 +57,13 @@ export default function WeekSection({
               <DayCard
                 key={day.id}
                 day={day}
+                isDragInRange={activeDragIds?.includes(day.id)}
+                isDragEndpoint={dragState?.isDragging && (day.id === dragState.startId || day.id === dragState.currentId)}
                 onToggleMenu={onToggleMenu}
                 onToggleExpand={onToggleExpand}
                 onChangeTab={onChangeTab}
+                onDragStart={onDragStart}
+                onDragEnter={onDragEnter}
               />
             ))}
           </div>
@@ -68,9 +76,13 @@ export default function WeekSection({
             <DayCard
               key={day.id}
               day={day}
+              isDragInRange={activeDragIds?.includes(day.id)}
+              isDragEndpoint={dragState?.isDragging && (day.id === dragState.startId || day.id === dragState.currentId)}
               onToggleMenu={onToggleMenu}
               onToggleExpand={onToggleExpand}
               onChangeTab={onChangeTab}
+              onDragStart={onDragStart}
+              onDragEnter={onDragEnter}
             />
           ))}
         </div>
