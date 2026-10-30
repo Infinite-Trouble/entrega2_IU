@@ -44,12 +44,9 @@ Los usuarios que reportaron problemas:
 ## 2. Metas de usuario que el MVP debe permitir completar
 
 
-### Meta 1 — "Quiero ver qué puedo almorzar esta semana y cuántas calorías tiene"
-
+### Meta 1 — "Quiero ver qué puedo almorzar esta semana y valor calórico"
 
 ### Meta 2 — "Quiero reservar menús veg e hipo para varios días en una sola pasada"
-
-
 
 ### Meta 3 — "Quiero revisar mis reservas y anular una si me surgió un imprevisto"
 
