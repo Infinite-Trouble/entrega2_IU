@@ -614,7 +614,24 @@
   .toggle-hipo { border: 1.5px solid var(--hipo); color: var(--hipo); }
   .toggle-hipo.active { background: var(--hipo); color: var(--white); }
   .toggle.pending { outline: 2px dashed currentColor; outline-offset: 2px; }
+  /* Efecto de elevación al pasar el cursor */
+  .toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  }
 
+  .toggle-veg:hover:not(.active) {
+  background: var(--veg-soft);
+  }
+
+  .toggle-hipo:hover:not(.active) {
+  background: var(--hipo-soft);
+  }
+
+  .toggle:active {
+  transform: translateY(0);
+  box-shadow: none;
+  }
   .day-status { margin: 0; font-size: 0.75rem; color: var(--ink-soft); }
 
   .expand-btn {
