@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { formatLongDate } from '../../utils/dateUtils';
 
-export default function MisConsumosView({ consumptions }) {
+export default function MisConsumosView({ consumptions, totalAlmuerzos = 4 }) {
   const [filterText, setFilterText] = useState('');
 
   const filteredConsumptions = consumptions.filter((c) => {
@@ -28,7 +28,7 @@ export default function MisConsumosView({ consumptions }) {
       <div className="balance-cards">
         <div className="balance-card">
           <div className="title">Almuerzos</div>
-          <div className="value">4</div>
+          <div className="value">{totalAlmuerzos}</div>
         </div>
         <div className="balance-card">
           <div className="title">Cenas</div>

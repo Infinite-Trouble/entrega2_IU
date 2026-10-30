@@ -15,7 +15,10 @@ import {
 import { REFERENCE_TODAY, isPast } from './utils/dateUtils';
 
 export default function App() {
-  const [user, setUser] = useState({ isLoggedIn: false, name: '' });
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('casino_user');
+    return saved ? JSON.parse(saved) : { isLoggedIn: false, name: '' };
+  });
   const [activeTab, setActiveTab] = useState('view-reserva');
   const [helpOpen, setHelpOpen] = useState(false);
 
@@ -24,9 +27,28 @@ export default function App() {
   });
   const toastTimerRef = useRef(null);
 
-  const [weeks, setWeeks] = useState(() => JSON.parse(JSON.stringify(INITIAL_WEEKS)));
-  const [reservations, setReservations] = useState([]);
+  const [weeks, setWeeks] = useState(() => {
+    const saved = localStorage.getItem('casino_weeks');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(INITIAL_WEEKS));
+  });
+  const [reservations, setReservations] = useState(() => {
+    const saved = localStorage.getItem('casino_reservations');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [consumptions] = useState(INITIAL_CONSUMPTIONS);
+
+  // Sincronizar estado en localStorage
+  useEffect(() => {
+    localStorage.setItem('casino_user', JSON.stringify(user));
+  }, [user]);
+
+  useEffect(() => {
+    localStorage.setItem('casino_weeks', JSON.stringify(weeks));
+  }, [weeks]);
+
+  useEffect(() => {
+    localStorage.setItem('casino_reservations', JSON.stringify(reservations));
+  }, [reservations]);
 
   // Referencias para selección (Shift + click y Arrastre de Rango)
   const lastClickedDayRef = useRef(null);
@@ -83,6 +105,7 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('casino_user');
     setUser({ isLoggedIn: false, name: '' });
     setActiveTab('view-reserva');
     showToast('Sesión cerrada.', 'info');
@@ -367,7 +390,10 @@ export default function App() {
             )}
 
             {activeTab === 'view-mis-consumos' && (
-              <MisConsumosView consumptions={consumptions} />
+              <MisConsumosView
+                consumptions={consumptions}
+                totalAlmuerzos={totalAlmuerzos}
+              />
             )}
           </div>
 
